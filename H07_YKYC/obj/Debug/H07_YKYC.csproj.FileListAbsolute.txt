@@ -37,3 +37,4 @@ D:\CSharpProjects\H07_YKYC\H07_YKYC\obj\Debug\H07_YKYC.SettingForm.resources
 D:\CSharpProjects\H07_YKYC\H07_YKYC\obj\Debug\H07_YKYC.csproj.GenerateResource.Cache
 D:\CSharpProjects\H07_YKYC\H07_YKYC\obj\Debug\H07_YKYC.exe
 D:\CSharpProjects\H07_YKYC\H07_YKYC\obj\Debug\H07_YKYC.pdb
+D:\CSharpProjects\H07_YKYC\H07_YKYC\obj\Debug\H07_YKYC.csproj.CoreCompileInputs.cache

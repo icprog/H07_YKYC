@@ -584,7 +584,6 @@ namespace H07_YKYC
             {
                 MyLog.Error("设置系统时间失败！");
             }
-
         }
 
         public static DateTime BytesToDateTime(byte[] bytes, int offset)
