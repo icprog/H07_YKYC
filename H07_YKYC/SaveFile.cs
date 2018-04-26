@@ -92,9 +92,9 @@ namespace H07_YKYC
             MyLog.Info("初始化运行日志存盘路径");
             Trace.WriteLine("Start FileInit!\n");
 
-            FileCreateTxt(Program.GetStartupPath() + @"接收\总控设备（遥控）\", out file_in1);
-            FileCreateTxt(Program.GetStartupPath() + @"接收\总控设备（遥测）\", out file_in2);
-            FileCreateTxt(Program.GetStartupPath() + @"接收\外系统接口计算机\", out file_in3);
+         //   FileCreateTxt(Program.GetStartupPath() + @"接收\总控设备（遥控）\", out file_in1);
+            //FileCreateTxt(Program.GetStartupPath() + @"接收\总控设备（遥测）\", out file_in2);
+          //  FileCreateTxt(Program.GetStartupPath() + @"接收\瑞信丰\", out file_in3);
 
             DataQueue_inList.Add(DataQueue_in1);
             DataQueue_inList.Add(DataQueue_in2);
@@ -106,12 +106,12 @@ namespace H07_YKYC
 
 
             FileCreateDat(Program.GetStartupPath() + @"接收\总控设备（遥控）\", out file_out1);
-            FileCreateDat(Program.GetStartupPath() + @"发送\应答机b\", out file_out2);
-            FileCreateDat(Program.GetStartupPath() + @"发送\窄波束SSA\", out file_out3);
-            FileCreateDat(Program.GetStartupPath() + @"发送\宽波束SSA\", out file_out4);
-            FileCreateDat(Program.GetStartupPath() + @"发送\中继KSA\", out file_out5);
-            FileCreateDat(Program.GetStartupPath() + @"发送\空空\", out file_out6);
-            FileCreateDat(Program.GetStartupPath() + @"发送\其它舱（总控）\", out file_out7);
+            FileCreateDat(Program.GetStartupPath() + @"发送\瑞信丰\", out file_out2);
+            FileCreateDat(Program.GetStartupPath() + @"接收\瑞信丰\原始数据\", out file_out3);
+            FileCreateDat(Program.GetStartupPath() + @"接收\瑞信丰\遥测数据\", out file_out4);
+            FileCreateDat(Program.GetStartupPath() + @"发送\总控设备（遥测）\", out file_out5);
+            //FileCreateDat(Program.GetStartupPath() + @"发送\空空\", out file_out6);
+            //FileCreateDat(Program.GetStartupPath() + @"发送\其它舱（总控）\", out file_out7);
 
             DataQueue_outList.Add(DataQueue_out1);
             DataQueue_outList.Add(DataQueue_out2);
@@ -159,18 +159,19 @@ namespace H07_YKYC
             Trace.WriteLine("开启存盘线程");
             SaveOn = true;
 
-            new Thread(() => { WriteToFileDat(0,file_out1,ref DataQueue_out1,ref Lock_Dat1); }).Start();//发送给应答机a的数据
-            new Thread(() => { WriteToFileDat(1, file_out2, ref DataQueue_out2, ref Lock_Dat2); }).Start();//发送给应答机b的数据
-            new Thread(() => { WriteToFileDat(2, file_out3, ref DataQueue_out3, ref Lock_Dat3); }).Start();//发送给窄波束SSA的数据
-            new Thread(() => { WriteToFileDat(3, file_out4, ref DataQueue_out4, ref Lock_Dat4); }).Start();//发送给宽波束SSA的数据
-            new Thread(() => { WriteToFileDat(4, file_out5, ref DataQueue_out5, ref Lock_Dat5); }).Start();//发送给中继KSA的数据
-            new Thread(() => { WriteToFileDat(5, file_out6, ref DataQueue_out6, ref Lock_Dat6); }).Start();//发送给空空的数据
-            new Thread(() => { WriteToFileDat(6, file_out7, ref DataQueue_out7, ref Lock_Dat7); }).Start();//发送给其它舱（总控）的数据
+            new Thread(() => { WriteToFileDat(0,file_out1,ref DataQueue_out1,ref Lock_Dat1); }).Start();//接收总控-->遥控的数据Dat
+            new Thread(() => { WriteToFileDat(1, file_out2, ref DataQueue_out2, ref Lock_Dat2); }).Start();//发送给瑞信丰的数据
+            new Thread(() => { WriteToFileDat(2, file_out3, ref DataQueue_out3, ref Lock_Dat3); }).Start();//接收瑞信丰的原始数据
+            new Thread(() => { WriteToFileDat(3, file_out4, ref DataQueue_out4, ref Lock_Dat4); }).Start();//接收瑞信丰的原始数据后去头去尾后的遥测数据
+
+            new Thread(() => { WriteToFileDat(4, file_out5, ref DataQueue_out5, ref Lock_Dat5); }).Start();//发送-->总控的数据Dat
+            //new Thread(() => { WriteToFileDat(5, file_out6, ref DataQueue_out6, ref Lock_Dat6); }).Start();//发送给空空的数据
+            //new Thread(() => { WriteToFileDat(6, file_out7, ref DataQueue_out7, ref Lock_Dat7); }).Start();//发送给其它舱（总控）的数据
 
 
-            new Thread(() => { WriteToFileTxt(0, file_in1, ref DataQueue_in1, ref Lock_Txt1); }).Start();//接收总控（主）的数据
-            new Thread(() => { WriteToFileTxt(1, file_in2, ref DataQueue_in2, ref Lock_Txt2); }).Start();//接收总控（备）的数据
-            new Thread(() => { WriteToFileTxt(2, file_in3, ref DataQueue_in3, ref Lock_Txt3); }).Start();//接收外系统计算机的数据
+    //        new Thread(() => { WriteToFileTxt(0, file_in1, ref DataQueue_in1, ref Lock_Txt1); }).Start();//接收总控-->遥控的数据txt
+    //        new Thread(() => { WriteToFileTxt(1, file_in2, ref DataQueue_in2, ref Lock_Txt2); }).Start();//接收总控（备）的数据
+    //        new Thread(() => { WriteToFileTxt(2, file_in3, ref DataQueue_in3, ref Lock_Txt3); }).Start();
         }
 
         public void FileClose()

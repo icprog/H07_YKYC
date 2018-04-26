@@ -463,7 +463,11 @@ namespace H07_YKYC
             {
                 if (Data.DataQueue_GT.Count > 0)
                 {
-                    myClientSocket.Send(Data.DataQueue_GT.Dequeue());
+                    Byte[] temp = Data.DataQueue_GT.Dequeue();
+                    myClientSocket.Send(temp);
+
+                    SaveFile.DataQueue_out5.Enqueue(temp);
+
                     Data.dtYC.Rows[3]["数量"] = (int)Data.dtYC.Rows[3]["数量"] + 1;
                 }
             }
@@ -503,6 +507,7 @@ namespace H07_YKYC
                         }
                         Trace.WriteLine(tempstr);
 
+                        //存储总控发来的
                         //  SaveFile.DataQueue_1.Enqueue(RecvBufZK1);
 
                         if (RecvNum > 29)
@@ -570,7 +575,7 @@ namespace H07_YKYC
                         }
                         Trace.WriteLine(tempstr);
 
-                        SaveFile.DataQueue_in1.Enqueue(tempstr);
+                //        SaveFile.DataQueue_in1.Enqueue(tempstr);
 
                         SaveFile.DataQueue_out1.Enqueue(RecvBufToFile);
 

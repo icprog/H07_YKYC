@@ -72,7 +72,7 @@ namespace H07_YKYC
             catch(Exception ex)
             {
                 //       MessageBox.Show("无法建立连接");
-                //Trace.WriteLine(ex.Message);
+                Trace.WriteLine(ex.Message);
                 return;
             }
 

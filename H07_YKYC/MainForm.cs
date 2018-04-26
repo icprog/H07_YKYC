@@ -92,10 +92,6 @@ namespace H07_YKYC
                 Data.DealCRTa.Led = pictureBox_CRTa;
                 Data.DealCRTa.init();
 
-                Data.DealCRTb.CRTName = "USB应答机B";
-                Data.DealCRTb.XHLEnable = true;
-                Data.DealCRTb.Led = pictureBox_CRTb;
-                Data.DealCRTb.init();
 
                 toolStripStatusLabel2.Text = "存储路径" + Path;
 
@@ -210,6 +206,17 @@ namespace H07_YKYC
             {
                 if (btn_ZK1_Close.Enabled) btn_ZK1_Close_Click(sender, e);
                 if (btn_ZK1_YC_Close.Enabled) btn_ZK1_YC_Close_Click(sender, e);
+
+                if(btn_CRTa_Open.Enabled ==false)
+                {
+                    ClientAPP.Disconnect(ref ClientAPP.Server_CRTa);
+                    ClientAPP.Disconnect(ref ClientAPP.Server_CRTa_Return);
+                    btn_CRTa_Open.Enabled = true;
+                    btn_CRTa_Close.Enabled = false;
+                    Data.DealCRTa.LedOff();
+                    MyLog.Info("关闭连接--USB应答机A");
+                }
+
                 Thread.Sleep(100);
                 mySaveFileThread.FileClose();
             }
@@ -217,7 +224,6 @@ namespace H07_YKYC
             {
                 Trace.WriteLine(ex.Message);
             }
-
         }
 
 
@@ -315,9 +321,6 @@ namespace H07_YKYC
 
         void DealCRT_On(ref Data.CRT_STRUCT myCRT)
         {
-            myCRT.mytextbox.Text = "";
-            myCRT.mytextbox_count.Text = "0";
-            myCRT.mytextbox_KB.Text = "0";
             myCRT.LedOn();
             MyLog.Info("连接成功--" + myCRT.CRTName);
 
@@ -340,7 +343,8 @@ namespace H07_YKYC
                     if (ClientAPP.Server_CRTa.IsConnected)
                     {
                         DealCRT_On(ref Data.DealCRTa);
-                        new Thread(() => { Fun_Transfer2CRT(ref Data.DealCRTa, ref ClientAPP.Server_CRTa, ref SaveFile.DataQueue_out1); }).Start();
+                        MyLog.Info("连接成功--" + Data.DealCRTa.CRTName + "--遥控端口");
+                        new Thread(() => { Fun_Transfer2CRT(ref Data.DealCRTa, ref ClientAPP.Server_CRTa, ref SaveFile.DataQueue_out2); }).Start();
                         new Thread(() => { Fun_RecvFromCRT(ref Data.DealCRTa, ref ClientAPP.Server_CRTa); }).Start();
                     }
                     else
@@ -356,7 +360,7 @@ namespace H07_YKYC
                     ClientAPP.Connect(ref ClientAPP.Server_CRTa_Return);
                     if (ClientAPP.Server_CRTa_Return.IsConnected)
                     {
-                        //MyLog.Info("连接成功--" + Data.DealCRTa.CRTName + "--小回路比对端口");
+                        MyLog.Info("连接成功--" + Data.DealCRTa.CRTName + "--遥测端口");
                         new Thread(() => { Fun_RecvFromCRT_Return(ref Data.DealCRTa, ref ClientAPP.Server_CRTa_Return); }).Start();
                     }
 
@@ -369,44 +373,6 @@ namespace H07_YKYC
                     Data.DealCRTa.LedOff();
                     MyLog.Info("关闭连接--USB应答机A");
                     break;
-
-                case "btn_CRTb_Open":
-                    MyLog.Info("尝试连接--USB应答机B...");
-                    ClientAPP.Server_CRTb.ServerIP = ConfigurationManager.AppSettings["Server_CRTb_Ip"];
-                    ClientAPP.Server_CRTb.ServerPORT = ConfigurationManager.AppSettings["Server_CRTb_Port"];
-                    ClientAPP.Connect(ref ClientAPP.Server_CRTb);
-                    if (ClientAPP.Server_CRTb.IsConnected)
-                    {
-                        DealCRT_On(ref Data.DealCRTb);
-                        new Thread(() => { Fun_Transfer2CRT(ref Data.DealCRTb, ref ClientAPP.Server_CRTb, ref SaveFile.DataQueue_out2); }).Start();
-                        new Thread(() => { Fun_RecvFromCRT(ref Data.DealCRTb, ref ClientAPP.Server_CRTb); }).Start();
-                    }
-                    else
-                    {
-                        DealCRT_Off(ref Data.DealCRTb);
-                        return;
-                    }
-                    btn_CRTb_Open.Enabled = false;
-                    btn_CRTb_Close.Enabled = true;
-
-                    ClientAPP.Server_CRTb_Return.ServerIP = ConfigurationManager.AppSettings["Server_CRTb_Ip"];
-                    ClientAPP.Server_CRTb_Return.ServerPORT = "3070";
-                    ClientAPP.Connect(ref ClientAPP.Server_CRTb_Return);
-                    if (ClientAPP.Server_CRTb_Return.IsConnected)
-                    {
-                        new Thread(() => { Fun_RecvFromCRT_Return(ref Data.DealCRTb, ref ClientAPP.Server_CRTb_Return); }).Start();
-                    }
-
-                    break;
-                case "btn_CRTb_Close":
-                    ClientAPP.Disconnect(ref ClientAPP.Server_CRTb);
-                    ClientAPP.Disconnect(ref ClientAPP.Server_CRTb_Return);
-                    btn_CRTb_Open.Enabled = true;
-                    btn_CRTb_Close.Enabled = false;
-                    Data.DealCRTb.LedOff();
-                    MyLog.Info("关闭连接--USB应答机B");
-                    break;
-
 
                 default:
                     break;
@@ -440,42 +406,6 @@ namespace H07_YKYC
 
                         this.Invoke(la, RecvBufInt[7].ToString(), myCRT.mytextbox);
 
-                        //switch (RecvBufInt[7])
-                        //{
-                        //    case 0:
-                        //        Trace.WriteLine("Successful");
-                        //        break;
-                        //    case 1:
-                        //        Trace.WriteLine("Operation ignored");
-                        //        break;
-                        //    case 2:
-                        //        Trace.WriteLine("Operation ignored");
-                        //        break;
-                        //    case 4:
-                        //        Trace.WriteLine("CMM1 checking failed");
-                        //        break;
-                        //    case 5:
-                        //        Trace.WriteLine("CMM2 checking failed");
-                        //        break;
-                        //    case 6:
-                        //        Trace.WriteLine("Group rejected");
-                        //        break;
-                        //    case 7:
-                        //        Trace.WriteLine("TCU failure");
-                        //        break;
-                        //    case 8:
-                        //        Trace.WriteLine("Bad TC demodulation");
-                        //        break;
-                        //    case 11:
-                        //        Trace.WriteLine("Bad TC chain configuration");
-                        //        break;
-                        //    case 12:
-                        //        Trace.WriteLine("Latest radiation time reached");
-                        //        break;
-                        //    default:
-                        //        Trace.WriteLine("Return TC ACKNOLOEDGEMENT　MESSAGES Undefined!!");
-                        //        break;
-                        //}
                     }
                     else
                     {
@@ -497,52 +427,70 @@ namespace H07_YKYC
         {
             Trace.WriteLine("++++++++++Entering" + myCRT.CRTName + "Fun_RecvFromCRT_Return!!");
 
-            int[] SendReq;
-            byte[] SendReqBytes;
-            //send request
-            SendReq = new int[16];
-            SendReq[0] = 1234567890;        //Start of msg
-            SendReq[1] = 64;                //Size of msg in bytes
-            SendReq[2] = 0;                 //Size of msg
-            SendReq[3] = 0;                 //0:channelA 1:channelB
-            SendReq[4] = 0;                 //Real time telemetry
-            SendReq[5] = 0;                 //Permanent flow 一次请求
-            SendReq[15] = -1234567890;
-            SendReqBytes = Program.IntToBytes(SendReq);
+            //int[] SendReq;
+            //byte[] SendReqBytes;
+            ////send request
+            //SendReq = new int[16];
+            //SendReq[0] = 1234567890;        //Start of msg
+            //SendReq[1] = 64;                //Size of msg in bytes
+            //SendReq[2] = 0;                 //Size of msg
+            //SendReq[3] = 0;                 //0:channelA 1:channelB
+            //SendReq[4] = 0;                 //Real time telemetry
+            //SendReq[5] = 0;                 //Permanent flow 一次请求
+            //SendReq[15] = -1234567890;
+            //SendReqBytes = Program.IntToBytes(SendReq);
 
-            int len = Server_CRT.sck.Send(SendReqBytes);
+            //int len = Server_CRT.sck.Send(SendReqBytes);
+
             while (Server_CRT.IsConnected)
             {
                 try
                 {
-                    byte[] RecvBufCRTa = new byte[1024];
+                    byte[] RecvBufCRTa = new byte[200];
                     int RecvNum = Server_CRT.sck.Receive(RecvBufCRTa);
-
 
                     if (RecvNum > 0)
                     {
-                        String strcpy = "";
-                        for (int m = 64; m < RecvNum - 4; m++)
-                        {
-                            strcpy += RecvBufCRTa[m].ToString("x2");
-                        }
-                        if (strcpy == myCRT.Transfer2CRTa_TempStr)
-                        {
-                            Trace.WriteLine("小回路比对正确");
-                            myCRT.CompareXHLResult = true;
-                            Data.ReturnCode = 0x51;
-                        }
-                        else
-                        {
-                            Trace.WriteLine("小回路比对错误");
-                            myCRT.CompareXHLResult = false;
-                            Data.ReturnCode = 0x52;
-                        }
-                        Data.WaitXHL_Return2ZK.Set();
-                        WaitXHLResult.Set();
-                        Trace.WriteLine(strcpy);
+                        //TempRecvBuf 本次收到的数据
+                        byte[] TempRecvBuf = new byte[RecvNum];
+                        Array.Copy(RecvBufCRTa, TempRecvBuf, RecvNum);
 
+                        SaveFile.Lock_Dat3.EnterWriteLock();
+                        SaveFile.DataQueue_out3.Enqueue(TempRecvBuf);
+                        SaveFile.Lock_Dat3.ExitWriteLock();
 
+                        String tempstr = "";
+                        for (int i = 0; i < TempRecvBuf.Length; i++)
+                        {
+                            tempstr += TempRecvBuf[i].ToString("x2");
+                        }
+                        Trace.WriteLine(tempstr);
+
+                        Data.dtYC.Rows[0]["数量"] = (int)Data.dtYC.Rows[0]["数量"] + 1; //收到总数
+
+                        //YCBuf 本次收到的实际遥测数据
+                        byte[] YCBuf = new byte[RecvNum - 68];
+                        Array.Copy(RecvBufCRTa, 64, YCBuf, 0, RecvNum - 68);
+
+                        SaveFile.Lock_Dat4.EnterWriteLock();
+                        SaveFile.DataQueue_out4.Enqueue(YCBuf);
+                        SaveFile.Lock_Dat4.ExitWriteLock();
+
+                        String tempstr2 = "";
+                        for (int i = 0; i < YCBuf.Length; i++)
+                        {
+                            tempstr2 += YCBuf[i].ToString("x2");
+                        }
+                        Trace.WriteLine(tempstr2);
+
+                        //ushort CRC = 0xffff;
+                        //ushort genpoly = 0x1021;
+                        //for (int i = 0; i < YCBuf.Length-2; i = i + 1)
+                        //{
+                        //    CRC = Function.CRChware(YCBuf[i], genpoly, CRC);
+                        //}
+                        ////      MyLog.Info("Calc 通道1 CRC = " + CRC.ToString("x4"));
+                        //Trace.WriteLine("Calc 通道1 CRC = " + CRC.ToString("x4"));
                     }
                     else
                     {
@@ -570,23 +518,18 @@ namespace H07_YKYC
                     byte[] SendByte = myCRT.DataQueue_CRT.Dequeue();
                     Server_CRT.sck.Send(SendByte);
 
-                    myCRT.SendCount += 1;//CRT发送次数+1
-                    myCRT.SendKB += SendByte.Length;//CRT发送Byte数叠加
-
-                    this.Invoke(la, myCRT.SendCount.ToString(), myCRT.mytextbox_count);
-                    this.Invoke(la, myCRT.SendKB.ToString(), myCRT.mytextbox_KB);
+                    Data.dtYK.Rows[3]["数量"] = (int)Data.dtYK.Rows[3]["数量"] + 1;
 
 
                     //增加存储，DataQueue_save为引用的对应SaveFile里面的Queue
                     DataQueue_save.Enqueue(SendByte);
-
-                    YKLogQueue.Enqueue(YKQueue.Dequeue());
 
                     myCRT.Transfer2CRTa_TempStr = "";
                     for (int m = 24; m < SendByte.Length - 8; m++)
                     {
                         myCRT.Transfer2CRTa_TempStr += SendByte[m].ToString("x2");
                     }
+                    Trace.WriteLine("Fun_Transfer2CRT:" + myCRT.Transfer2CRTa_TempStr);
 
                 }
 
@@ -611,48 +554,6 @@ namespace H07_YKYC
             return returnBytes;
 
         }
-
-        /// <summary>
-        /// 根据输入的checkbox的Name值调用DealSomething来处理小回路比对的使能和关闭
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void checkBox_KSSA_CheckedChanged(object sender, EventArgs e)
-        {
-            CheckBox myCheckBox = (CheckBox)sender;
-            switch (myCheckBox.Name)
-            {
-                case "checkBox_CRTa":
-                    DealSomething(ref Data.DealCRTa, ref myCheckBox);
-                    break;
-                case "checkBox_CRTb":
-                    DealSomething(ref Data.DealCRTb, ref myCheckBox);
-                    break;
-                case "checkBox_ZSSA":
-                    DealSomething(ref Data.DealZSSA, ref myCheckBox);
-                    break;
-                case "checkBox_KSSA":
-                    DealSomething(ref Data.DealKSSA, ref myCheckBox);
-                    break;
-                default:
-                    break;
-            }
-        }
-        static void DealSomething(ref Data.CRT_STRUCT myCRT, ref CheckBox myCheckBox)
-        {
-            if (myCheckBox.Checked)
-            {
-                myCRT.XHLEnable = true;
-                MyLog.Info(myCRT.CRTName + "小回路比对功能开启");
-            }
-            else
-            {
-                myCRT.XHLEnable = false;
-                MyLog.Info(myCRT.CRTName + "小回路比对功能关闭");
-            }
-        }
-
-
 
         /// <summary>
         /// 启动服务器Socket监听总控设备
@@ -689,8 +590,6 @@ namespace H07_YKYC
 
             btn_ZK1_Close.Enabled = false;
             btn_ZK1_Open.Enabled = true;
-
-
         }
 
 
@@ -801,7 +700,7 @@ namespace H07_YKYC
             time_login = Function.Get_Time();
             time_login.CopyTo(VCDU, 6);//时间
 
-            Data.dtVCDU.Rows[0]["插入域"] = time_login[0].ToString("x2")+ time_login[1].ToString("x2")
+            Data.dtVCDU.Rows[0]["插入域"] = time_login[0].ToString("x2") + time_login[1].ToString("x2")
                 + time_login[2].ToString("x2") + time_login[3].ToString("x2")
                 + time_login[4].ToString("x2") + time_login[5].ToString("x2");
 
@@ -834,6 +733,42 @@ namespace H07_YKYC
             {
                 dr["数量"] = 0;
             }
+        }
+
+        private void btn_SendYC_Click(object sender, EventArgs e)
+        {
+            #region SJXL.Length = 255，用来解随机序列
+            byte[] SJXL = new byte[] { 0xff, 0x39, 0x9e, 0x5a, 0x68, 0xe9, 0x06, 0xf5, 0x6c, 0x89, 0x2f, 0xa1, 0x31, 0x5e, 0x08, 0xc0, 0x52, 0xa8, 0xbb, 0xae, 0x4e, 0xc2, 0xc7, 0xed, 0x66, 0xdc, 0x38, 0xd4, 0xf8, 0x86, 0x50, 0x3d, 0xfe, 0x73, 0x3c, 0xb4, 0xd1, 0xd2, 0x0d, 0xea, 0xd9, 0x12, 0x5f, 0x42, 0x62, 0xbc, 0x11, 0x80, 0xa5, 0x51, 0x77, 0x5c, 0x9d, 0x85, 0x8f, 0xda, 0xcd, 0xb8, 0x71, 0xa9, 0xf1, 0x0c, 0xa0, 0x7b, 0xfc, 0xe6, 0x79, 0x69, 0xa3, 0xa4, 0x1b, 0xd5, 0xb2, 0x24, 0xbe, 0x84, 0xc5, 0x78, 0x23, 0x01, 0x4a, 0xa2, 0xee, 0xb9, 0x3b, 0x0b, 0x1f, 0xb5, 0x9b, 0x70, 0xe3, 0x53, 0xe2, 0x19, 0x40, 0xf7, 0xf9, 0xcc, 0xf2, 0xd3, 0x47, 0x48, 0x37, 0xab, 0x64, 0x49, 0x7d, 0x09, 0x8a, 0xf0, 0x46, 0x02, 0x95, 0x45, 0xdd, 0x72, 0x76, 0x16, 0x3f, 0x6b, 0x36, 0xe1, 0xc6, 0xa7, 0xc4, 0x32, 0x81, 0xef, 0xf3, 0x99, 0xe5, 0xa6, 0x8e, 0x90, 0x6f, 0x56, 0xc8, 0x92, 0xfa, 0x13, 0x15, 0xe0, 0x8c, 0x05, 0x2a, 0x8b, 0xba, 0xe4, 0xec, 0x2c, 0x7e, 0xd6, 0x6d, 0xc3, 0x8d, 0x4f, 0x88, 0x65, 0x03, 0xdf, 0xe7, 0x33, 0xcb, 0x4d, 0x1d, 0x20, 0xde, 0xad, 0x91, 0x25, 0xf4, 0x26, 0x2b, 0xc1, 0x18, 0x0a, 0x55, 0x17, 0x75, 0xc9, 0xd8, 0x58, 0xfd, 0xac, 0xdb, 0x87, 0x1a, 0x9f, 0x10, 0xca, 0x07, 0xbf, 0xce, 0x67, 0x96, 0x9a, 0x3a, 0x41, 0xbd, 0x5b, 0x22, 0x4b, 0xe8, 0x4c, 0x57, 0x82, 0x30, 0x14, 0xaa, 0x2e, 0xeb, 0x93, 0xb0, 0xb1, 0xfb, 0x59, 0xb7, 0x0e, 0x35, 0x3e, 0x21, 0x94, 0x0f, 0x7f, 0x9c, 0xcf, 0x2d, 0x34, 0x74, 0x83, 0x7a, 0xb6, 0x44, 0x97, 0xd0, 0x98, 0xaf, 0x04, 0x60, 0x29, 0x54, 0x5d, 0xd7, 0x27, 0x61, 0x63, 0xf6, 0xb3, 0x6e, 0x1c, 0x6a, 0x7c, 0x43, 0x28, 0x1e };
+            #endregion
+
+            string Str_Content = this.textBox1.Text.Replace(" ", "");
+            int AddAlen = 16 - (Str_Content.Length % 16);
+            Str_Content = Str_Content.PadRight(AddAlen, 'A');
+
+            Trace.WriteLine("加扰前：" + Str_Content);
+
+            byte[] temp = StrToHexByte(Str_Content);
+
+            byte[] tempbuf = new byte[temp.Length];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                tempbuf[i] = (byte)(temp[i] ^ SJXL[i]);
+            }
+
+            string tempstr = "";
+            for (int i = 0; i < tempbuf.Length; i++)
+            {
+                tempstr += tempbuf[i].ToString("x2");
+            }
+
+            Trace.WriteLine("加扰后：" + tempstr);
+
+            tempstr = "eb90" + tempstr + "C5C5C5C5C5C579";
+            Trace.WriteLine("加头尾：" + tempstr);
+
+            byte[] FinalSend = StrToHexByte(tempstr);
+
+            Data.DealCRTa.DataQueue_CRT.Enqueue(FinalSend);
         }
     }
 }

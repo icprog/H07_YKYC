@@ -45,10 +45,9 @@ namespace H07_YKYC
 
 
             textBox_CRTa_IP.Text = ConfigurationManager.AppSettings["Server_CRTa_Ip"];
-            textBox_CRTb_IP.Text = ConfigurationManager.AppSettings["Server_CRTb_Ip"];
 
             textBox_CRTa_Port.Text = ConfigurationManager.AppSettings["Server_CRTa_Port"];
-            textBox_CRTb_Port.Text = ConfigurationManager.AppSettings["Server_CRTb_Port"];
+            textBox_CRTa_Port2.Text = ConfigurationManager.AppSettings["Server_CRTa_Port2"];
 
         }
 
@@ -109,10 +108,9 @@ namespace H07_YKYC
 
 
                 mform.SetConfigValue("Server_CRTa_Ip", textBox_CRTa_IP.Text);
-                mform.SetConfigValue("Server_CRTb_Ip", textBox_CRTb_IP.Text);
 
                 mform.SetConfigValue("Server_CRTa_Port", textBox_CRTa_Port.Text);
-                mform.SetConfigValue("Server_CRTb_Port", textBox_CRTb_Port.Text);
+                mform.SetConfigValue("Server_CRTa_Port2", textBox_CRTa_Port2.Text);
             }
             else
             {
