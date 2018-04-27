@@ -137,7 +137,7 @@ namespace H07_YKYC
         public static byte[] InfoFlag_ACKR = new byte[4] { (byte)'A', (byte)'C', (byte)'K', (byte)'R' };//小回路比对应答
         public static byte[] InfoFlag_DAGF = new byte[4] { (byte)'D', (byte)'A', (byte)'G', (byte)'F' };
         public static byte[] InfoFlag_DCUZ = new byte[4] { (byte)'D', (byte)'C', (byte)'U', (byte)'Z' };//对地测控通道下行遥测源码
-        public static byte[] InfoFlag_DMTC = new byte[4] { (byte)'D', (byte)'M', (byte)'Y', (byte)'C' };//对地测控上行注数数据
+        public static byte[] InfoFlag_DMTC = new byte[4] { (byte)'D', (byte)'M', (byte)'T', (byte)'C' };//对地测控上行注数数据
         //-------------------------辅助标识------------------------------------
         public static byte Help_Flag = (byte)':';
 

@@ -470,8 +470,11 @@ namespace H07_YKYC
             Data.Num_X07.CopyTo(data_tozk, 2);//航天器编号:X07     
 
             time_login = Function.Get_Time();
-            time_login.CopyTo(data_tozk, 11);//时间
-            data_tozk[16] = 0x00;
+            time_login.CopyTo(data_tozk, 10);//时间
+
+            Trace.WriteLine("timelogin:",time_login[0].ToString("x2")+ time_login[1].ToString("x2")+ time_login[2].ToString("x2")+ time_login[3].ToString("x2")+ time_login[4].ToString("x2")+ time_login[5].ToString("x2"));
+
+                data_tozk[16] = 0x00;
             data_tozk[17] = data_flag;//参数:数据标识:R
 
             //信息标识:DAGF
@@ -501,7 +504,7 @@ namespace H07_YKYC
             data_login[0] = (byte)(len & 0x00FF);
             data_login[1] = (byte)((len & 0xFF00) >> 8);//长度[0~1]
 
-            Data.Num_MTC.CopyTo(data_login, 2);//航天器编号[2~9]“梦天初样”
+            Data.Num_X07.CopyTo(data_login, 2);//航天器编号[2~9]“X07      ”
 
             time_login = Function.Get_Time();
             time_login.CopyTo(data_login, 10);//时间[10~15]

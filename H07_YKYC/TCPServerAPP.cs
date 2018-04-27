@@ -232,6 +232,7 @@ namespace H07_YKYC
                         {
                             //----------发送登陆信息-----------
                             ClientSocket.Send(Function.Make_login_frame(Data.Data_Flag_Real, Data.ZK_S1));
+
                             MyLog.Info("遥测前端服务器---->向总控（主）发送登陆信息");
 
                             ClientAPP.ClientZK1_YC.IsConnected = true;

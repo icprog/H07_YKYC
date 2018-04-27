@@ -110,7 +110,7 @@ namespace H07_YKYC
             FileCreateDat(Program.GetStartupPath() + @"接收\瑞信丰\原始数据\", out file_out3);
             FileCreateDat(Program.GetStartupPath() + @"接收\瑞信丰\遥测数据\", out file_out4);
             FileCreateDat(Program.GetStartupPath() + @"发送\总控设备（遥测）\", out file_out5);
-            //FileCreateDat(Program.GetStartupPath() + @"发送\空空\", out file_out6);
+            FileCreateDat(Program.GetStartupPath() + @"生成数据\", out file_out6);
             //FileCreateDat(Program.GetStartupPath() + @"发送\其它舱（总控）\", out file_out7);
 
             DataQueue_outList.Add(DataQueue_out1);
@@ -136,6 +136,15 @@ namespace H07_YKYC
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
 
+            DirectoryInfo di = new DirectoryInfo(Path);
+            foreach (FileInfo fi in di.GetFiles())
+            {
+                if(fi.Length==0)
+                {
+                    File.Delete(fi.FullName);
+                }
+            }
+
             string timestr = string.Format("{0}-{1:D2}-{2:D2} {3:D2}：{4:D2}：{5:D2}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             string filename = Path + timestr + ".dat";
             file = new FileStream(filename, FileMode.Create);
@@ -146,6 +155,15 @@ namespace H07_YKYC
         {
             if (!Directory.Exists(Path))
                 Directory.CreateDirectory(Path);
+
+            DirectoryInfo di = new DirectoryInfo(Path);
+            foreach (FileInfo fi in di.GetFiles())
+            {
+                if (fi.Length == 0)
+                {
+                    File.Delete(fi.FullName);
+                }
+            }
 
             string timestr = string.Format("{0}-{1:D2}-{2:D2} {3:D2}：{4:D2}：{5:D2}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             string filename = Path + timestr + ".txt";
@@ -165,7 +183,7 @@ namespace H07_YKYC
             new Thread(() => { WriteToFileDat(3, file_out4, ref DataQueue_out4, ref Lock_Dat4); }).Start();//接收瑞信丰的原始数据后去头去尾后的遥测数据
 
             new Thread(() => { WriteToFileDat(4, file_out5, ref DataQueue_out5, ref Lock_Dat5); }).Start();//发送-->总控的数据Dat
-            //new Thread(() => { WriteToFileDat(5, file_out6, ref DataQueue_out6, ref Lock_Dat6); }).Start();//发送给空空的数据
+            new Thread(() => { WriteToFileDat(5, file_out6, ref DataQueue_out6, ref Lock_Dat6); }).Start();//发送给空空的数据
             //new Thread(() => { WriteToFileDat(6, file_out7, ref DataQueue_out7, ref Lock_Dat7); }).Start();//发送给其它舱（总控）的数据
 
 

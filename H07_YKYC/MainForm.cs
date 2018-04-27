@@ -230,7 +230,7 @@ namespace H07_YKYC
         #region MainForm_Paint
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            Trace.WriteLine("MainForm_Paint");
+        //    Trace.WriteLine("MainForm_Paint");
 
         }
         #endregion
@@ -390,8 +390,6 @@ namespace H07_YKYC
         {
             Trace.WriteLine("Entering" + myCRT.CRTName + "Fun_RecvFromCRT!!");
 
-            Delegate la = new UpdateText(UpdateTextMethod);
-
             while (Server_CRT.IsConnected)
             {
                 try
@@ -403,8 +401,6 @@ namespace H07_YKYC
                         int[] RecvBufInt = Program.BytesToInt(RecvBufCRTa);
 
                         myCRT.TCMsgStatus = RecvBufInt[7];
-
-                        this.Invoke(la, RecvBufInt[7].ToString(), myCRT.mytextbox);
 
                     }
                     else
@@ -704,7 +700,12 @@ namespace H07_YKYC
                 + time_login[2].ToString("x2") + time_login[3].ToString("x2")
                 + time_login[4].ToString("x2") + time_login[5].ToString("x2");
 
-            for (int i = 12; i < 1018; i++) VCDU[i] = (byte)i;
+            for (int i = 12; i < 1018; i++) VCDU[i] = 0xff;
+
+            
+            byte[] temp2 = Function.StrToHexByte(textBox2.Text);
+            Array.Copy(temp2, 0, VCDU, 12, temp2.Length);
+
 
             byte[] Return_Send = Function.Make_tozk_YC_frame(Data.Data_Flag_Real, Data.InfoFlag_DMTC, VCDU);
             if (myServer.ServerOn_YC)
@@ -763,12 +764,17 @@ namespace H07_YKYC
 
             Trace.WriteLine("加扰后：" + tempstr);
 
-            tempstr = "eb90" + tempstr + "C5C5C5C5C5C579";
+            tempstr = "eb90" + tempstr + "C5C5C5C5C5C5C579AAAAAAAAAA";
             Trace.WriteLine("加头尾：" + tempstr);
 
             byte[] FinalSend = StrToHexByte(tempstr);
 
-            Data.DealCRTa.DataQueue_CRT.Enqueue(FinalSend);
+
+            byte[] FinalToCRT = Function.Make_toCortex_frame(FinalSend);
+
+            SaveFile.DataQueue_out6.Enqueue(FinalToCRT);
+
+            Data.DealCRTa.DataQueue_CRT.Enqueue(FinalToCRT);
         }
     }
 }
