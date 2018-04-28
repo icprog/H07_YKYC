@@ -282,7 +282,7 @@ namespace H07_YKYC
             string type_str = Encoding.ASCII.GetString(infoflag);
             Trace.WriteLine("type_str is :" + type_str);
 
-            //   MyLog.Info("收到总控--：" + type_str + "数据量:" + RecvNum.ToString() + "内容：" + printstr);
+            MyLog.Info("收到总控--：" + type_str + "数据量:" + RecvNum.ToString() + "内容：" + printstr);
 
             switch (type_str)
             {
@@ -301,6 +301,7 @@ namespace H07_YKYC
                     //返回应答信息码
                     //service.send(data)
                     break;
+                case "CCUK":
                 case "CCUA"://总控-->遥控-->USB应答机a(遥控K令及密钥/算法注入)
                     DealWithZK2CRT_K(DealData, ref Data.DealCRTa);
                     break;
@@ -322,7 +323,7 @@ namespace H07_YKYC
                     //遥控注数应答
                     byte[] Return_data = new byte[len + 17];//16head+len(Body)，+1Byte retrun code
                     MsgHead.CopyTo(Return_data, 0);
-                    MsgBody.CopyTo(Return_data, 4);
+                    MsgBody.CopyTo(Return_data, 16);
                     Return_data[len + 16] = 0x30;
 
                     byte[] CmdType = new byte[4];
@@ -483,6 +484,7 @@ namespace H07_YKYC
                 if (Data.DataQueue_ZK_ACK.Count > 0)
                 {
                     myClientSocket.Send(Data.DataQueue_ZK_ACK.Dequeue());
+                    Trace.WriteLine("向总控发送1次信息！");
                 }
             }
         }
@@ -580,7 +582,7 @@ namespace H07_YKYC
 
                         SaveFile.DataQueue_out1.Enqueue(RecvBufToFile);
 
-                        if (RecvNum > 45 && RecvNum < 300)
+                        if (RecvNum >= 45 && RecvNum < 300)
                         {
                             MyLog.Info("收到遥测数据量：" + RecvNum.ToString());
                             Data.dtYK.Rows[1]["数量"] = (int)Data.dtYK.Rows[1]["数量"] + 1;

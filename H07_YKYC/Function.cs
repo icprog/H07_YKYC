@@ -436,7 +436,7 @@ namespace H07_YKYC
             Data.Num_X07.CopyTo(data_tozk, 2);//航天器编号:TGMTC001
 
             time_login = Function.Get_Time();
-            time_login.CopyTo(data_tozk, 11);//时间
+            time_login.CopyTo(data_tozk, 10);//时间
             data_tozk[16] = 0x00;
             data_tozk[17] = data_flag;//参数:数据标识:R
 
